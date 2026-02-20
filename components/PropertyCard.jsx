@@ -17,7 +17,7 @@ const PropertyCard = ({ property }) => {
     } else if (rates.weekly) {
       return `$${rates.weekly.toLocaleString()}/wk`;
     } else if (rates.nightly) {
-      return `$${rates.nightlyly.toLocaleString()}/night`;
+      return `$${rates.nightly.toLocaleString()}/night`;
     }
   };
 
