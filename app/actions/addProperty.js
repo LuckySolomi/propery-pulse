@@ -47,16 +47,21 @@ async function addProperty(formData) {
 
   const imageUrls = [];
   for (const imageFile of images) {
-    const imageBuffer = await imageFile.arrayBuffer();
-    const imageArray = Array.from(new Uint8Array(imageBuffer));
-    const imageBase64 = Buffer.from(imageArray).toString("base64");
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
 
-    const result = await cloudinary.uploader.upload(
-      `data:image/png;base64,${imageBase64}`,
-      {
-        folder: "propertypulse",
-      },
-    );
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "propertypulse",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          },
+        )
+        .end(buffer);
+    });
 
     imageUrls.push(result.secure_url);
   }
