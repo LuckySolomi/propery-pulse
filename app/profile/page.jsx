@@ -3,6 +3,7 @@ import connectDB from "@/config/database";
 import Property from "@/models/property";
 import { getSessionUser } from "@/utils/getSessionUser";
 import ProfileProperties from "@/components/ProfileProperties";
+import { convertToSerializableObject } from "@/utils/convertToObject";
 import profileDefault from "@/assets/images/profile.png";
 
 const ProfilePage = async () => {
@@ -16,7 +17,9 @@ const ProfilePage = async () => {
     throw new Error("User not authenticated");
   }
 
-  const userProperties = await Property.find({ owner: userId }).lean();
+  const propertiesDocs = await Property.find({ owner: userId }).lean();
+  const properties = propertiesDocs.map(convertToSerializableObject);
+
   return (
     <section className="bg-blue-50">
       <div className="container m-auto py-24">
@@ -46,7 +49,7 @@ const ProfilePage = async () => {
 
             <div className="md:w-3/4 md:pl-4">
               <h2 className="text-xl font-semibold mb-4">Your Listings</h2>
-              <ProfileProperties properties={userProperties} />
+              <ProfileProperties properties={properties} />
             </div>
           </div>
         </div>

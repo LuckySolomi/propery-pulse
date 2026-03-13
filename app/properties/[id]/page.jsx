@@ -5,18 +5,23 @@ import PropertyDetails from "@/components/PropertyDetails";
 import PropertyImages from "@/components/PropertyImages";
 import connectDB from "@/config/database";
 import Property from "@/models/property";
-
 import { notFound } from "next/navigation";
+import { convertToSerializableObject } from "@/utils/convertToObject";
 
 const PropertyPage = async ({ params }) => {
   const { id } = await params;
 
   await connectDB();
 
-  const property = await Property.findById(id).lean();
+  const propertyDoc = await Property.findById(id).lean();
+  const property = convertToSerializableObject(propertyDoc);
 
   if (!property) {
-    notFound();
+    return (
+      <h1 className="text-center text-2xl font-bold mt-10">
+        Property Not Found
+      </h1>
+    );
   }
 
   return (
