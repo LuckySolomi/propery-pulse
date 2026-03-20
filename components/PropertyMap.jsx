@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { useQuery } from "@tanstack/react-query";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import L from "leaflet";
 
 // dynamic imports (Next.js fix)
@@ -57,7 +56,7 @@ const PropertyMap = ({ property }) => {
   return (
     <MapContainer
       center={[lat, lng]}
-      zoom={13}
+      zoom={14}
       style={{ height: "500px", width: "100%" }}
     >
       <TileLayer
