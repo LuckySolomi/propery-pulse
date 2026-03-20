@@ -1,64 +1,72 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { setDefaults, fromAddress } from 'react-geocode';
+"use client";
+
+import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+import { useQuery } from "@tanstack/react-query";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import L from "leaflet";
+
+// dynamic imports (Next.js fix)
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false },
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false },
+);
+const Marker = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Marker),
+  { ssr: false },
+);
 
 const PropertyMap = ({ property }) => {
-  const [lat, setLat] = useState(null);
-  const [lng, setLng] = useState(null);
-  const [viewport, setViewport] = useState({
-    latitude: 0,
-    longitude: 0,
-    zoom: 12,
-    width: '100%',
-    height: '500px',
-  });
-  const [loading, setLoading] = useState(true);
-  const [geocodeError, setGeocodeError] = useState(false);
+  const TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 
-  setDefaults({
-    key: process.env.NEXT_PUBLIC_GOOGLE_GEOCODING_API_KEY,
-    language: 'en',
-    region: 'us',
-  });
+  const address = `${property.location.street} ${property.location.city} ${property.location.state} ${property.location.zipcode}`;
 
-  useEffect(() => {
-    const fetchCoords = async () => {
-      try {
-        const res = await fromAddress(
-          `${property.location.street} ${property.location.city} ${property.location.state} ${property.location.zipcode}`
-        );
+  const getCoords = async () => {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
+    );
+    const data = await res.json();
 
-        // Check geocode results
-        if (res.results.length === 0) {
-          setGeocodeError(true);
-          return;
-        }
+    if (!data || data.length === 0) throw new Error("No data");
 
-        const { lat, lng } = res.results[0].geometry.location;
-        setLat(lat);
-        setLng(lng);
-        setViewport({
-          ...viewport,
-          latitude: lat,
-          longitude: lng,
-        });
-      } catch (error) {
-        console.log(error);
-        setGeocodeError(true);
-      } finally {
-        setLoading(false);
-      }
+    return {
+      lat: parseFloat(data[0].lat),
+      lng: parseFloat(data[0].lon),
     };
+  };
 
-    fetchCoords();
-  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["coords", address],
+    queryFn: getCoords,
+    staleTime: 1000 * 60 * 60,
+  });
 
-  if (loading) return <h3>Loading...</h3>;
+  const customIcon = L.divIcon({
+    html: `<div style="color: red; font-size: 30px;">📍</div>`,
+  });
 
-  if (geocodeError)
-    return <div className='text-xl'>No location data found</div>;
+  if (isLoading) return <h3>Loading...</h3>;
+  if (error) return <div>No location data found</div>;
 
-  return <div>Map</div>;
+  const { lat, lng } = data;
+
+  return (
+    <MapContainer
+      center={[lat, lng]}
+      zoom={13}
+      style={{ height: "500px", width: "100%" }}
+    >
+      <TileLayer
+        url={TILE_URL}
+        attribution="&copy; OpenStreetMap contributors"
+      />
+      <Marker position={[lat, lng]} icon={customIcon} />
+    </MapContainer>
+  );
 };
 
 export default PropertyMap;
