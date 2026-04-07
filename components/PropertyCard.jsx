@@ -49,15 +49,15 @@ const PropertyCard = ({ property }) => {
     <div className="mt-auto">
       <div className="flex justify-center gap-4 text-gray-500 mb-4">
         <p>
-          <FaBed className="md:hidden lg:inline" /> {property.beds}{" "}
+          <FaBed className="inline mr-1" /> {property.beds}{" "}
           <span className="md:hidden lg:inline">Beds</span>
         </p>
         <p>
-          <FaBath className="md:hidden lg:inline" /> {property.baths}{" "}
+          <FaBath className="inline mr-1" /> {property.baths}{" "}
           <span className="md:hidden lg:inline">Baths</span>
         </p>
         <p>
-          <FaRulerCombined className="md:hidden lg:inline" />
+          <FaRulerCombined className="inline mr-1" />
           {property.square_feet}{" "}
           <span className="md:hidden lg:inline">sqft</span>
         </p>
@@ -65,10 +65,10 @@ const PropertyCard = ({ property }) => {
 
       <div className="flex justify-center gap-4 text-green-900 text-sm mb-4">
         <p>
-          <FaMoneyBill className="md:hidden lg:inline" /> Weekly
+          <FaMoneyBill className="inline mr-1" /> Weekly
         </p>
         <p>
-          <FaMoneyBill className="md:hidden lg:inline" /> Monthly
+          <FaMoneyBill className="inline mr-1" /> Monthly
         </p>
       </div>
 
